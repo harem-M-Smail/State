@@ -1,4 +1,5 @@
 import { useReducer, useState } from "react" 
+import Todo from "./Todo"
 const Home=()=>{
     const ACTIONS={
         ADD:"add",
@@ -21,29 +22,39 @@ const Home=()=>{
               default: 
               return todos 
             } } 
-
             const handleSubmit=(e)=>{ 
                 e.preventDefault() 
-                dispatch({type:ACTIONS.ADD,payload:name}) 
+                dispatch({type:ACTIONS.ADD,payload:name})
                 setName("")
             } 
             const newTodo=(name)=>{return {id:Date.now(),name:name,isCompleted:false}}
             const [name,setName]=useState("") 
             const [todos,dispatch]=useReducer(reducer,[]) 
-            
-            return( 
-            <div> 
-                <form onSubmit={handleSubmit}> 
-                <input type="text" value={name} onChange={(e)=>setName(e.target.value)} />
-                </form> 
-                {todos.map((todo)=>(
-                    <div key={todo.id}>
-                        {todo.isCompleted ?<p className="text-green-500">{todo.name}</p> :<p className="text-yellow-400">{todo.name}</p>}
-                        <button onClick={()=>dispatch({type:ACTIONS.TOGGLE,payload:todo.id})}>toggle</button>
-                        <button onClick={()=>dispatch({type:ACTIONS.DELETE,payload:todo.id})}>delete</button>
+            const sortedTodos=todos.sort((a,b)=>{
+                if(a.isCompleted===true){
+                    return -1
+                }else if(a.isCompleted===false){
+                    return 1
+                }else {
+                    return 0
+                }
+            })
 
-                    </div>
+            return (
+              <div className="flex flex-col items-center p-2">
+                <form onSubmit={handleSubmit}>
+                  <input
+                    className=" shadow-md shadow-slate-300  p-1 rounded-md min-w-72 focus:outline-none"
+                    placeholder="Add a Todo"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </form>
+                {sortedTodos.map((todo) => (
+                  <Todo todo={todo} dispatch={dispatch} ACTIONS={ACTIONS} />
                 ))}
-                </div> ) 
+              </div>
+            ); 
                 } 
                 export default Home
+            
